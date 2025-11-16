@@ -5,17 +5,27 @@
   <title>Turnos – Paciente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --primary: #1976d2;
+      --primary-light: #e3f2fd;
+      --danger: #c62828;
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --border: #e0e0e0;
+      --text-muted: #757575;
+    }
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding: 16px;
-      background: #f5f5f5;
+      background: var(--bg);
     }
     .card {
-      max-width: 720px;
+      max-width: 1100px;
       margin: 0 auto;
-      background: #fff;
-      padding: 16px 20px;
+      background: var(--card-bg);
+      padding: 16px 20px 20px;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
@@ -23,61 +33,61 @@
       font-size: 1.4rem;
       margin: 0 0 8px;
     }
-    p {
-      margin-top: 0;
-      color: #555;
-      font-size: 0.95rem;
+    h2 {
+      font-size: 1rem;
+      margin: 0 0 8px;
     }
     label {
       display: block;
       margin: 8px 0 4px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
     }
     select, input {
-      width: 100%;
-      padding: 8px 10px;
+      padding: 6px 8px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       box-sizing: border-box;
+      width: 100%;
     }
     button {
-      padding: 8px 14px;
+      padding: 6px 10px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 12px;
+      font-size: 0.85rem;
+      margin-top: 8px;
     }
     .btn-primary {
-      background: #1976d2;
+      background: var(--primary);
       color: #fff;
     }
     .btn-secondary {
       background: #eee;
+      color: #111;
     }
-    .turnos {
-      margin-top: 16px;
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
     }
-    .turno {
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 16px;
+      margin-top: 12px;
     }
-    .turno span {
-      display: block;
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
     }
+
     .alert {
-      margin-top: 10px;
-      padding: 8px 10px;
+      margin-top: 8px;
+      padding: 6px 8px;
       border-radius: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .alert-ok {
       background: #e8f5e9;
@@ -87,61 +97,197 @@
       background: #ffebee;
       color: #c62828;
     }
+
+    /* Calendario */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .calendar-header span {
+      font-weight: 600;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      font-size: 0.8rem;
+    }
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 4px 0;
+    }
+    .calendar-day {
+      padding: 6px 4px;
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: #fafafa;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+    .calendar-day.disabled {
+      cursor: default;
+      color: #bdbdbd;
+      background: #f5f5f5;
+    }
+    .calendar-day.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .calendar-day span.date-num {
+      font-weight: 600;
+    }
+    .calendar-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--primary);
+      margin-top: 4px;
+    }
+    .calendar-day.today {
+      outline: 1px dashed var(--primary);
+    }
+
+    /* Lista de horarios */
+    .slots-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+      font-size: 0.85rem;
+    }
+    .slot-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 6px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+    }
+    .slot-item:nth-child(odd) {
+      background: #fafafa;
+    }
+    .slot-time {
+      font-weight: 600;
+    }
+    .slot-duracion {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .seleccionados-list {
+      max-height: 160px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+    .seleccionados-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 4px;
+    }
+    .text-muted {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .small {
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Reservar turno</h1>
-    <p>Seleccioná el tipo de consulta y luego elegí uno de los turnos disponibles.</p>
-
-    <label for="tratamiento">Tipo de tratamiento</label>
-    <select id="tratamiento">
-      <option value="">Seleccionar…</option>
-    </select>
-
-    <label for="fechaDesde">Desde (opcional)</label>
-    <input type="date" id="fechaDesde">
-
-    <label for="fechaHasta">Hasta (opcional)</label>
-    <input type="date" id="fechaHasta">
-
-    <button class="btn-primary" id="btnBuscar">Buscar turnos</button>
+    <h1>Solicitud de turnos – Paciente</h1>
+    <p class="text-muted small">
+      Seleccioná el tratamiento, elegí el día en el calendario y marcá uno o más horarios disponibles.
+      Podés tomar más de un turno (mismo día o días diferentes). Para cada día, la suma de duración no puede superar 120 minutos.
+    </p>
 
     <div id="alert" class="alert" style="display:none;"></div>
 
-    <div class="turnos" id="listaTurnos"></div>
+    <label for="tratamiento">Tratamiento</label>
+    <select id="tratamiento">
+      <option value="">Seleccioná un tratamiento</option>
+    </select>
 
-    <div id="formReserva" style="display:none; margin-top:16px;">
-      <h2 style="font-size:1.1rem; margin-bottom:6px;">Confirmar reserva</h2>
-      <p id="resumenTurno" style="font-size:0.9rem; color:#444;"></p>
+    <div class="layout">
+      <!-- Columna izquierda: Calendario -->
+      <div>
+        <h2>Calendario</h2>
+        <div class="calendar-header">
+          <button class="btn-secondary" id="btnPrevMes">&lt;</button>
+          <span id="labelMes"></span>
+          <button class="btn-secondary" id="btnNextMes">&gt;</button>
+        </div>
+        <div class="calendar-grid" id="calendar">
+          <!-- Cabecera días semana + días -->
+        </div>
+      </div>
 
-      <label for="paciente_nombre">Nombre y apellido</label>
-      <input type="text" id="paciente_nombre" placeholder="Juan Pérez">
+      <!-- Columna derecha: horarios + selección -->
+      <div>
+        <h2>Horarios del día</h2>
+        <p id="labelDiaSeleccionado" class="text-muted small">Elegí un día con turnos disponibles.</p>
+        <div class="slots-list" id="listaHorarios">
+          <p class="text-muted small" style="text-align:center; margin:8px 0;">No hay horarios para mostrar.</p>
+        </div>
 
-      <label for="paciente_contacto">Teléfono o email</label>
-      <input type="text" id="paciente_contacto" placeholder="Contacto">
+        <h2 style="margin-top:12px;">Turnos seleccionados</h2>
+        <div class="seleccionados-list" id="listaSeleccionados">
+          <p class="text-muted small" style="text-align:center; margin:8px 0;">Todavía no seleccionaste turnos.</p>
+        </div>
 
-      <button class="btn-primary" id="btnConfirmar">Confirmar turno</button>
-      <button class="btn-secondary" id="btnCancelar">Cancelar</button>
+        <div style="margin-top:8px;">
+          <label for="paciente_nombre">Nombre y apellido</label>
+          <input type="text" id="paciente_nombre" placeholder="Nombre y apellido del paciente" />
+
+          <label for="paciente_contacto">Contacto (teléfono o email)</label>
+          <input type="text" id="paciente_contacto" placeholder="Teléfono / email para confirmar" />
+        </div>
+
+        <button class="btn-primary" id="btnConfirmar">Confirmar turnos</button>
+      </div>
     </div>
   </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev"; // <-- reemplazar
-function buildUrl(paramsObj) {
-  const separator = API_URL.includes("?") ? "&" : "?";
-  const params = new URLSearchParams(paramsObj);
-  return API_URL + separator + params.toString();
-}
+  // ==== CONFIGURACIÓN API ====
+  // Usa la MISMA URL del Web App que ya funciona en profesional
+  const API_URL = "PON_AQUI_TU_URL_WEBAPP";
 
-  let turnosActuales = [];
-  let turnoSeleccionado = null;
+  function buildUrl(paramsObj) {
+    const url = new URL(API_URL);
+    Object.entries(paramsObj || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.set(key, value);
+      }
+    });
+    return url.toString();
+  }
 
   async function fetchJSON(url, options = {}) {
     const res = await fetch(url, options);
-    const data = await res.json();
-    return data;
+    return res.json();
   }
+
+  // ==== ESTADO ====
+  let tratamientos = [];
+  let turnosDisponibles = []; // Todos los turnos libres del rango
+  let currentMonth = new Date(); // Se usará el 1° de mes internamente
+  let diaSeleccionado = null;   // string "YYYY-MM-DD"
+  let seleccionados = {};       // id_turno -> turno
 
   function mostrarAlerta(msg, tipo = "ok") {
     const el = document.getElementById("alert");
@@ -155,144 +301,377 @@ function buildUrl(paramsObj) {
     el.style.display = "none";
   }
 
+  // ============================
+  //   TRATAMIENTOS
+  // ============================
   async function cargarTratamientos() {
     try {
-    const data = await fetchJSON(buildUrl({ action: "listarTratamientos" }));
-      const select = document.getElementById("tratamiento");
-      select.innerHTML = '<option value="">Seleccionar…</option>';
-
-      if (data.ok && data.tratamientos) {
-        data.tratamientos.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t.id_tratamiento;
-          opt.textContent = t.nombre;
-          select.appendChild(opt);
-        });
-      }
-    } catch (err) {
-      mostrarAlerta("Error al cargar tratamientos", "error");
-      console.error(err);
-    }
-  }
-
-  async function buscarTurnos() {
-    limpiarAlerta();
-    document.getElementById("listaTurnos").innerHTML = "";
-    document.getElementById("formReserva").style.display = "none";
-
-    const idTratamiento = document.getElementById("tratamiento").value;
-    if (!idTratamiento) {
-      mostrarAlerta("Seleccioná un tipo de tratamiento", "error");
-      return;
-    }
-
-    const fechaDesde = document.getElementById("fechaDesde").value;
-    const fechaHasta = document.getElementById("fechaHasta").value;
-
-    const params = { action: "listarTurnosDisponibles", idTratamiento };
-if (fechaDesde) params.fechaDesde = fechaDesde;
-if (fechaHasta) params.fechaHasta = fechaHasta;
-
-const data = await fetchJSON(buildUrl(params));
+      const data = await fetchJSON(buildUrl({ action: "listarTratamientos" }));
       if (!data.ok) {
-        mostrarAlerta(data.error || "Error al buscar turnos", "error");
+        mostrarAlerta("Error al cargar tratamientos", "error");
         return;
       }
-
-      turnosActuales = data.turnos || [];
-
-      if (turnosActuales.length === 0) {
-        mostrarAlerta("No hay turnos disponibles para ese tratamiento y rango de fechas", "error");
-        return;
-      }
-
-      const cont = document.getElementById("listaTurnos");
-      cont.innerHTML = "";
-
-      turnosActuales.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "turno";
-        div.innerHTML = `
-          <div>
-            <span><strong>${t.fecha}</strong></span>
-            <span>${t.hora_inicio} – ${t.hora_fin}</span>
-          </div>
-          <button class="btn-primary" data-id="${t.id_turno}">Tomar</button>
-        `;
-        cont.appendChild(div);
+      tratamientos = data.tratamientos || [];
+      const sel = document.getElementById("tratamiento");
+      sel.innerHTML = '<option value="">Seleccioná un tratamiento</option>';
+      tratamientos.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id_tratamiento;
+        opt.textContent = t.nombre;
+        sel.appendChild(opt);
       });
-
-      // delegación de eventos
-      cont.addEventListener("click", (ev) => {
-        const btn = ev.target.closest("button[data-id]");
-        if (!btn) return;
-        const id = btn.getAttribute("data-id");
-        seleccionarTurno(id);
-      }, { once: true });
-
     } catch (err) {
-      mostrarAlerta("Error al buscar turnos", "error");
       console.error(err);
+      mostrarAlerta("Error al cargar tratamientos", "error");
     }
   }
 
-  function seleccionarTurno(id_turno) {
-    turnoSeleccionado = turnosActuales.find(t => t.id_turno === id_turno);
-    if (!turnoSeleccionado) return;
-
-    const resumen = document.getElementById("resumenTurno");
-    resumen.textContent = `Vas a reservar el turno del ${turnoSeleccionado.fecha} de ${turnoSeleccionado.hora_inicio} a ${turnoSeleccionado.hora_fin}.`;
-
-    document.getElementById("formReserva").style.display = "block";
-    document.getElementById("paciente_nombre").value = "";
-    document.getElementById("paciente_contacto").value = "";
+  // ============================
+  //   CALENDARIO
+  // ============================
+  function normalizarPrimerDiaMes(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
-  async function confirmarReserva() {
-    if (!turnoSeleccionado) return;
+  function formatFechaISO(date) {
+    return date.toISOString().slice(0, 10);
+  }
 
-    const paciente_nombre = document.getElementById("paciente_nombre").value.trim();
-    const paciente_contacto = document.getElementById("paciente_contacto").value.trim();
+  function formatFechaLabel(date) {
+    return date.toLocaleDateString("es-AR", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
 
-    if (!paciente_nombre) {
-      mostrarAlerta("Ingresá tu nombre para confirmar", "error");
+  async function recargarTurnosParaMes() {
+    const selTrat = document.getElementById("tratamiento").value;
+    if (!selTrat) {
+      turnosDisponibles = [];
+      renderCalendario();
+      renderHorariosDia(null);
       return;
     }
+
+    limpiarAlerta();
+    const firstDay = normalizarPrimerDiaMes(currentMonth);
+    const lastDay = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0);
+
+    const fechaDesde = formatFechaISO(firstDay);
+    const fechaHasta = formatFechaISO(lastDay);
 
     try {
-     const res = await fetchJSON(buildUrl({ action: "reservarTurno" }), {
-  method: "POST",
-  body: JSON.stringify({
-    id_turno: turnoSeleccionado.id_turno,
-    paciente_nombre,
-    paciente_contacto
-  })
-});
+      const data = await fetchJSON(
+        buildUrl({
+          action: "listarTurnosDisponibles",
+          idTratamiento: selTrat,
+          fechaDesde,
+          fechaHasta
+        })
+      );
+      if (!data.ok) {
+        mostrarAlerta(data.error || "Error al cargar turnos disponibles", "error");
+        turnosDisponibles = [];
+      } else {
+        // Se espera que vengan solo turnos LIBRE; si no, filtramos:
+        turnosDisponibles = (data.turnos || []).filter(t => t.estado === "LIBRE" || !t.estado);
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarAlerta("Error al cargar turnos disponibles", "error");
+      turnosDisponibles = [];
+    }
 
-      if (!res.ok) {
-        mostrarAlerta(res.error || "No se pudo reservar el turno", "error");
-        return;
+    diaSeleccionado = null;
+    renderCalendario();
+    renderHorariosDia(null);
+  }
+
+  function renderCalendario() {
+    const cal = document.getElementById("calendar");
+    cal.innerHTML = "";
+
+    const firstDay = normalizarPrimerDiaMes(currentMonth);
+    const year = firstDay.getFullYear();
+    const month = firstDay.getMonth();
+
+    const labelMes = document.getElementById("labelMes");
+    labelMes.textContent = firstDay.toLocaleDateString("es-AR", {
+      month: "long",
+      year: "numeric"
+    });
+
+    const diasSemana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+    diasSemana.forEach(d => {
+      const div = document.createElement("div");
+      div.className = "calendar-day-header";
+      div.textContent = d;
+      cal.appendChild(div);
+    });
+
+    const primerDiaSemana = (firstDay.getDay() + 6) % 7; // 0 = lunes
+
+    for (let i = 0; i < primerDiaSemana; i++) {
+      const dummy = document.createElement("div");
+      cal.appendChild(dummy);
+    }
+
+    const ultimoDiaMes = new Date(year, month + 1, 0).getDate();
+    const hoyISO = formatFechaISO(new Date());
+
+    const mapaFechas = {};
+    turnosDisponibles.forEach(t => {
+      if (!t.fecha) return;
+      if (!mapaFechas[t.fecha]) mapaFechas[t.fecha] = 0;
+      mapaFechas[t.fecha] += 1;
+    });
+
+    for (let dia = 1; dia <= ultimoDiaMes; dia++) {
+      const date = new Date(year, month, dia);
+      const fechaISO = formatFechaISO(date);
+      const tieneTurnos = !!mapaFechas[fechaISO];
+
+      const div = document.createElement("div");
+      div.className = "calendar-day";
+      if (!tieneTurnos) div.classList.add("disabled");
+      if (diaSeleccionado === fechaISO) div.classList.add("selected");
+      if (fechaISO === hoyISO) div.classList.add("today");
+
+      const spanNum = document.createElement("span");
+      spanNum.className = "date-num";
+      spanNum.textContent = dia;
+      div.appendChild(spanNum);
+
+      if (tieneTurnos) {
+        const dot = document.createElement("div");
+        dot.className = "calendar-dot";
+        div.appendChild(dot);
       }
 
-      mostrarAlerta("Turno reservado correctamente", "ok");
-      document.getElementById("formReserva").style.display = "none";
-      document.getElementById("listaTurnos").innerHTML = "";
-      turnoSeleccionado = null;
+      if (tieneTurnos) {
+        div.addEventListener("click", () => {
+          diaSeleccionado = fechaISO;
+          renderCalendario();
+          renderHorariosDia(fechaISO);
+        });
+      }
 
-    } catch (err) {
-      mostrarAlerta("Error al reservar turno", "error");
-      console.error(err);
+      cal.appendChild(div);
     }
   }
 
-  document.getElementById("btnBuscar").addEventListener("click", buscarTurnos);
-  document.getElementById("btnConfirmar").addEventListener("click", confirmarReserva);
-  document.getElementById("btnCancelar").addEventListener("click", () => {
-    document.getElementById("formReserva").style.display = "none";
-    turnoSeleccionado = null;
-  });
+  // ============================
+  //   HORARIOS DEL DÍA
+  // ============================
+  function getDuracionMin(turno) {
+    if (turno.duracion_min) return turno.duracion_min;
+    if (!turno.hora_inicio || !turno.hora_fin) return 0;
+    const [h1, m1] = turno.hora_inicio.split(":").map(Number);
+    const [h2, m2] = turno.hora_fin.split(":").map(Number);
+    return (h2 * 60 + m2) - (h1 * 60 + m1);
+  }
 
-  cargarTratamientos();
+  function renderHorariosDia(fechaISO) {
+    const lista = document.getElementById("listaHorarios");
+    const labelDia = document.getElementById("labelDiaSeleccionado");
+    lista.innerHTML = "";
+
+    if (!fechaISO) {
+      labelDia.textContent = "Elegí un día con turnos disponibles.";
+      lista.innerHTML = '<p class="text-muted small" style="text-align:center; margin:8px 0;">No hay horarios para mostrar.</p>';
+      return;
+    }
+
+    const date = new Date(fechaISO + "T00:00:00");
+    labelDia.textContent = "Turnos libres para " + formatFechaLabel(date);
+
+    const turnosDia = turnosDisponibles
+      .filter(t => t.fecha === fechaISO)
+      .sort((a, b) => (a.hora_inicio || "").localeCompare(b.hora_inicio || ""));
+
+    if (!turnosDia.length) {
+      lista.innerHTML = '<p class="text-muted small" style="text-align:center; margin:8px 0;">No hay turnos libres para este día.</p>';
+      return;
+    }
+
+    turnosDia.forEach(t => {
+      const durMin = getDuracionMin(t);
+      const div = document.createElement("div");
+      div.className = "slot-item";
+
+      const left = document.createElement("div");
+      left.innerHTML = `
+        <div class="slot-time">${t.hora_inicio || ""} – ${t.hora_fin || ""}</div>
+        <div class="slot-duracion">${durMin} min</div>
+      `;
+
+      const right = document.createElement("div");
+      const chk = document.createElement("input");
+      chk.type = "checkbox";
+      chk.dataset.id = t.id_turno;
+      if (seleccionados[t.id_turno]) chk.checked = true;
+
+      chk.addEventListener("change", () => onToggleSeleccionTurno(t, chk.checked));
+
+      right.appendChild(chk);
+      div.appendChild(left);
+      div.appendChild(right);
+      lista.appendChild(div);
+    });
+  }
+
+  function onToggleSeleccionTurno(turno, checked) {
+    const id = turno.id_turno;
+    const fecha = turno.fecha;
+    const durMin = getDuracionMin(turno);
+
+    if (checked) {
+      let totalDia = durMin;
+      Object.values(seleccionados).forEach(sel => {
+        if (sel.fecha === fecha) {
+          totalDia += getDuracionMin(sel);
+        }
+      });
+      if (totalDia > 120) {
+        mostrarAlerta("Para un mismo día no podés superar 120 minutos de turnos.", "error");
+        const lista = document.getElementById("listaHorarios");
+        const chk = lista.querySelector(`input[type="checkbox"][data-id="${id}"]`);
+        if (chk) chk.checked = false;
+        return;
+      }
+      seleccionados[id] = turno;
+    } else {
+      delete seleccionados[id];
+    }
+
+    renderSeleccionados();
+  }
+
+  function renderSeleccionados() {
+    const cont = document.getElementById("listaSeleccionados");
+    cont.innerHTML = "";
+
+    const todos = Object.values(seleccionados);
+    if (!todos.length) {
+      cont.innerHTML = '<p class="text-muted small" style="text-align:center; margin:8px 0;">Todavía no seleccionaste turnos.</p>';
+      return;
+    }
+
+    const ordenados = todos.sort((a, b) => {
+      if (a.fecha === b.fecha) {
+        return (a.hora_inicio || "").localeCompare(b.hora_inicio || "");
+      }
+      return (a.fecha || "").localeCompare(b.fecha || "");
+    });
+
+    const totalesPorDia = {};
+    ordenados.forEach(t => {
+      if (!totalesPorDia[t.fecha]) totalesPorDia[t.fecha] = 0;
+      totalesPorDia[t.fecha] += getDuracionMin(t);
+    });
+
+    ordenados.forEach(t => {
+      const div = document.createElement("div");
+      div.className = "seleccionados-item";
+      const d = new Date(t.fecha + "T00:00:00");
+
+      div.innerHTML = `
+        <span>${d.toLocaleDateString("es-AR")} – ${t.hora_inicio || ""}–${t.hora_fin || ""}</span>
+        <span>${getDuracionMin(t)} min</span>
+      `;
+      cont.appendChild(div);
+    });
+
+    const resumen = document.createElement("div");
+    resumen.className = "text-muted small";
+    const partes = Object.entries(totalesPorDia).map(([fecha, mins]) => {
+      const d = new Date(fecha + "T00:00:00");
+      return `${d.toLocaleDateString("es-AR")}: ${mins} min`;
+    });
+    resumen.textContent = "Total por día: " + partes.join(" | ");
+    cont.appendChild(resumen);
+  }
+
+  // ============================
+  //   CONFIRMAR TURNOS
+  // ============================
+  async function confirmarTurnos() {
+    limpiarAlerta();
+    const todos = Object.values(seleccionados);
+    if (!todos.length) {
+      mostrarAlerta("No seleccionaste ningún turno.", "error");
+      return;
+    }
+
+    const nombre = document.getElementById("paciente_nombre").value.trim();
+    const contacto = document.getElementById("paciente_contacto").value.trim();
+    if (!nombre || !contacto) {
+      mostrarAlerta("Completá nombre y contacto para reservar.", "error");
+      return;
+    }
+
+    if (!confirm(`Vas a reservar ${todos.length} turno(s). ¿Confirmar?`)) return;
+
+    let okCount = 0;
+    let errores = 0;
+
+    for (const t of todos) {
+      try {
+        const res = await fetchJSON(
+          buildUrl({ action: "reservarTurno" }),
+          {
+            method: "POST",
+            body: JSON.stringify({
+              id_turno: t.id_turno,
+              paciente_nombre: nombre,
+              paciente_contacto: contacto
+            })
+          }
+        );
+        if (res.ok) okCount++;
+        else errores++;
+      } catch (err) {
+        console.error(err);
+        errores++;
+      }
+    }
+
+    if (okCount && !errores) {
+      mostrarAlerta(`Se reservaron ${okCount} turno(s) correctamente.`, "ok");
+    } else if (okCount && errores) {
+      mostrarAlerta(`Algunos turnos se reservaron pero hubo ${errores} error(es).`, "error");
+    } else {
+      mostrarAlerta("No se pudo reservar ningún turno.", "error");
+    }
+
+    // Después de reservar, recargamos datos del mes actual
+    seleccionados = {};
+    await recargarTurnosParaMes();
+    renderSeleccionados();
+  }
+
+  // ============================
+  //   EVENTOS E INIT
+  // ============================
+  document.getElementById("tratamiento").addEventListener("change", recargarTurnosParaMes);
+  document.getElementById("btnPrevMes").addEventListener("click", async () => {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    await recargarTurnosParaMes();
+  });
+  document.getElementById("btnNextMes").addEventListener("click", async () => {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+    await recargarTurnosParaMes();
+  });
+  document.getElementById("btnConfirmar").addEventListener("click", confirmarTurnos);
+
+  (async function init() {
+    currentMonth = normalizarPrimerDiaMes(new Date());
+    renderCalendario(); // inicial vacío
+    renderSeleccionados();
+    await cargarTratamientos();
+  })();
 </script>
 </body>
 </html>
