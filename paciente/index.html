@@ -128,6 +128,11 @@
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev"; // <-- reemplazar
+function buildUrl(paramsObj) {
+  const separator = API_URL.includes("?") ? "&" : "?";
+  const params = new URLSearchParams(paramsObj);
+  return API_URL + separator + params.toString();
+}
 
   let turnosActuales = [];
   let turnoSeleccionado = null;
@@ -152,7 +157,7 @@
 
   async function cargarTratamientos() {
     try {
-      const data = await fetchJSON(API_URL + "?action=listarTratamientos");
+    const data = await fetchJSON(buildUrl({ action: "listarTratamientos" }));
       const select = document.getElementById("tratamiento");
       select.innerHTML = '<option value="">Seleccionar…</option>';
 
@@ -184,15 +189,11 @@
     const fechaDesde = document.getElementById("fechaDesde").value;
     const fechaHasta = document.getElementById("fechaHasta").value;
 
-    const params = new URLSearchParams({
-      action: "listarTurnosDisponibles",
-      idTratamiento
-    });
-    if (fechaDesde) params.append("fechaDesde", fechaDesde);
-    if (fechaHasta) params.append("fechaHasta", fechaHasta);
+    const params = { action: "listarTurnosDisponibles", idTratamiento };
+if (fechaDesde) params.fechaDesde = fechaDesde;
+if (fechaHasta) params.fechaHasta = fechaHasta;
 
-    try {
-      const data = await fetchJSON(API_URL + "?" + params.toString());
+const data = await fetchJSON(buildUrl(params));
       if (!data.ok) {
         mostrarAlerta(data.error || "Error al buscar turnos", "error");
         return;
@@ -259,14 +260,14 @@
     }
 
     try {
-      const res = await fetchJSON(API_URL + "?action=reservarTurno", {
-        method: "POST",
-        body: JSON.stringify({
-          id_turno: turnoSeleccionado.id_turno,
-          paciente_nombre,
-          paciente_contacto
-        })
-      });
+     const res = await fetchJSON(buildUrl({ action: "reservarTurno" }), {
+  method: "POST",
+  body: JSON.stringify({
+    id_turno: turnoSeleccionado.id_turno,
+    paciente_nombre,
+    paciente_contacto
+  })
+});
 
       if (!res.ok) {
         mostrarAlerta(res.error || "No se pudo reservar el turno", "error");
