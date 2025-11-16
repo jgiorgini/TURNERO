@@ -204,21 +204,27 @@
   </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev; // <-- reemplazar
-function buildUrl(paramsObj) {
-  const separator = API_URL.includes("?") ? "&" : "?";
-  const params = new URLSearchParams(paramsObj);
-  return API_URL + separator + params.toString();
-}
+  // ⬇⬇⬇ PON ACÁ LA URL DEL WEB APP QUE TE DEVUELVE JSON {"ok":true,...}
+  const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev";
 
-  let tratamientos = [];
-  let mapaTratamientos = {};
+  // Helper para construir la URL con parámetros, aunque API_URL ya tenga '?'
+  function buildUrl(paramsObj) {
+    const url = new URL(API_URL);
+    Object.entries(paramsObj || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.set(key, value);
+      }
+    });
+    return url.toString();
+  }
 
   async function fetchJSON(url, options = {}) {
     const res = await fetch(url, options);
-    const data = await res.json();
-    return data;
+    return res.json();
   }
+
+  let tratamientos = [];
+  let mapaTratamientos = {};
 
   function mostrarAlerta(msg, tipo = "ok") {
     const el = document.getElementById("alert");
@@ -232,9 +238,12 @@ function buildUrl(paramsObj) {
     el.style.display = "none";
   }
 
+  // ============================
+  //   Cargar tratamientos
+  // ============================
   async function cargarTratamientos() {
     try {
-      const data = await fetchJSON(API_URL + "?action=listarTratamientos");
+      const data = await fetchJSON(buildUrl({ action: "listarTratamientos" }));
       if (!data.ok) {
         mostrarAlerta("Error al cargar tratamientos", "error");
         return;
@@ -246,7 +255,6 @@ function buildUrl(paramsObj) {
       const selFiltro = document.getElementById("f_tratamiento");
       const selCrear = document.getElementById("c_tratamiento");
 
-      // limpiar manteniendo opción inicial
       selFiltro.innerHTML = '<option value="">Todos</option>';
       selCrear.innerHTML = '<option value="">(sin etiqueta)</option>';
 
@@ -268,6 +276,9 @@ function buildUrl(paramsObj) {
     }
   }
 
+  // ============================
+  //   Cargar turnos
+  // ============================
   async function cargarTurnos() {
     limpiarAlerta();
     const fechaDesde = document.getElementById("f_fechaDesde").value;
@@ -275,16 +286,14 @@ function buildUrl(paramsObj) {
     const idTratamiento = document.getElementById("f_tratamiento").value;
     const estado = document.getElementById("f_estado").value;
 
-    const params = new URLSearchParams({
-      action: "listarTurnosAdmin"
-    });
-    if (fechaDesde) params.append("fechaDesde", fechaDesde);
-    if (fechaHasta) params.append("fechaHasta", fechaHasta);
-    if (idTratamiento) params.append("idTratamiento", idTratamiento);
-    if (estado) params.append("estado", estado);
+    const params = { action: "listarTurnosAdmin" };
+    if (fechaDesde) params.fechaDesde = fechaDesde;
+    if (fechaHasta) params.fechaHasta = fechaHasta;
+    if (idTratamiento) params.idTratamiento = idTratamiento;
+    if (estado) params.estado = estado;
 
     try {
-      const data = await fetchJSON(API_URL + "?" + params.toString());
+      const data = await fetchJSON(buildUrl(params));
       if (!data.ok) {
         mostrarAlerta(data.error || "Error al cargar turnos", "error");
         return;
@@ -354,10 +363,13 @@ function buildUrl(paramsObj) {
 
   async function actualizarTurnoEstado(id_turno, estado) {
     try {
-      const res = await fetchJSON(API_URL + "?action=actualizarTurno", {
-        method: "POST",
-        body: JSON.stringify({ id_turno, estado })
-      });
+      const res = await fetchJSON(
+        buildUrl({ action: "actualizarTurno" }),
+        {
+          method: "POST",
+          body: JSON.stringify({ id_turno, estado })
+        }
+      );
       if (!res.ok) {
         mostrarAlerta(res.error || "Error al actualizar turno", "error");
       } else {
@@ -372,10 +384,13 @@ function buildUrl(paramsObj) {
   async function cancelarTurno(id_turno) {
     if (!confirm("¿Seguro que querés cancelar este turno?")) return;
     try {
-      const res = await fetchJSON(API_URL + "?action=cancelarTurno", {
-        method: "POST",
-        body: JSON.stringify({ id_turno })
-      });
+      const res = await fetchJSON(
+        buildUrl({ action: "cancelarTurno" }),
+        {
+          method: "POST",
+          body: JSON.stringify({ id_turno })
+        }
+      );
       if (!res.ok) {
         mostrarAlerta(res.error || "Error al cancelar turno", "error");
       } else {
@@ -406,18 +421,21 @@ function buildUrl(paramsObj) {
     }
 
     try {
-      const res = await fetchJSON(API_URL + "?action=crearTurnosMasivos", {
-        method: "POST",
-        body: JSON.stringify({
-          fechaDesde,
-          fechaHasta,
-          horaInicio,
-          horaFin,
-          duracionMin,
-          diasSemana,
-          id_tratamiento: id_tratamiento || null
-        })
-      });
+      const res = await fetchJSON(
+        buildUrl({ action: "crearTurnosMasivos" }),
+        {
+          method: "POST",
+          body: JSON.stringify({
+            fechaDesde,
+            fechaHasta,
+            horaInicio,
+            horaFin,
+            duracionMin,
+            diasSemana,
+            id_tratamiento: id_tratamiento || null
+          })
+        }
+      );
       if (!res.ok) {
         mostrarAlerta(res.error || "Error al crear turnos", "error");
         return;
