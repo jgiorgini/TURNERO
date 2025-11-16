@@ -205,6 +205,11 @@
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev; // <-- reemplazar
+function buildUrl(paramsObj) {
+  const separator = API_URL.includes("?") ? "&" : "?";
+  const params = new URLSearchParams(paramsObj);
+  return API_URL + separator + params.toString();
+}
 
   let tratamientos = [];
   let mapaTratamientos = {};
