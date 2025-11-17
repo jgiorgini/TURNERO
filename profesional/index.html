@@ -169,6 +169,12 @@
 
     <div class="seccion">
       <h2 style="font-size:1rem; margin-top:0;">Crear turnos masivos</h2>
+      <div class="seccion">
+  <h2 style="font-size:1rem; margin-top:0;">Configuración del consultorio</h2>
+  <label for="cfg_logo_url">URL del logo</label>
+  <input type="text" id="cfg_logo_url" placeholder="Pegá aquí la URL de la imagen del logo">
+  <button class="btn-secondary" id="btnGuardarLogo">Guardar logo</button>
+</div>
       <div class="filtros">
         <div>
           <label for="c_fechaDesde">Fecha desde</label>
@@ -213,6 +219,30 @@
 <script>
   // ⬇⬇⬇ PON ACÁ LA URL DEL WEB APP QUE TE DEVUELVE JSON {"ok":true,...}
   const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev";
+  async function guardarLogo() {
+  const url = document.getElementById("cfg_logo_url").value.trim();
+  try {
+    const res = await fetchJSON(
+      buildUrl({ action: "updateLogo" }),
+      {
+        method: "POST",
+        body: JSON.stringify({ logo_url: url })
+      }
+    );
+    if (res.ok) {
+      mostrarAlerta("Logo actualizado", "ok");
+      const img = document.getElementById("logoConsultorio");
+      if (img) img.src = url;
+    } else {
+      mostrarAlerta(res.error || "No se pudo actualizar el logo", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta("Error al actualizar el logo", "error");
+  }
+}
+
+document.getElementById("btnGuardarLogo").addEventListener("click", guardarLogo);
 async function cargarConfig() {
   try {
     const data = await fetchJSON(buildUrl({ action: "getConfig" }));
