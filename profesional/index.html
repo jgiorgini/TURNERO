@@ -213,6 +213,17 @@
 <script>
   // ⬇⬇⬇ PON ACÁ LA URL DEL WEB APP QUE TE DEVUELVE JSON {"ok":true,...}
   const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev";
+async function cargarConfig() {
+  try {
+    const data = await fetchJSON(buildUrl({ action: "getConfig" }));
+    if (data.ok && data.logo_url) {
+      const img = document.getElementById("logoConsultorio");
+      if (img) img.src = data.logo_url;
+    }
+  } catch (err) {
+    console.error("Error al cargar config/logo", err);
+  }
+}
 
   // Helper para construir la URL con parámetros, aunque API_URL ya tenga '?'
   function buildUrl(paramsObj) {
