@@ -471,6 +471,10 @@ async function cargarConfig() {
 
   // init
   (async function init() {
+    (async function init() {
+  await cargarConfig();
+  // ... resto de init (cargarTratamientos, etc.)
+})();
     await cargarTratamientos();
     await cargarTurnos();
   })();
