@@ -685,6 +685,10 @@ async function cargarConfig() {
   document.getElementById("btnConfirmar").addEventListener("click", confirmarTurnos);
 
   (async function init() {
+    (async function init() {
+  await cargarConfig();
+  // ... resto de init (cargarTratamientos, etc.)
+})();
     currentMonth = normalizarPrimerDiaMes(new Date());
     renderCalendario(); // inicial vacío
     renderSeleccionados();
