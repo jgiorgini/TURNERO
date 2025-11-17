@@ -273,6 +273,17 @@
   // ==== CONFIGURACIÓN API ====
   // Usa la MISMA URL del Web App que ya funciona en profesional
   const API_URL = "https://script.google.com/macros/s/AKfycbzftYndPyC2m7l2AKuFsvYpZUESUopPooWTY3nSG-g9xsbfTgRlXdBSyZQY4SfS8DBY/exec";
+async function cargarConfig() {
+  try {
+    const data = await fetchJSON(buildUrl({ action: "getConfig" }));
+    if (data.ok && data.logo_url) {
+      const img = document.getElementById("logoConsultorio");
+      if (img) img.src = data.logo_url;
+    }
+  } catch (err) {
+    console.error("Error al cargar config/logo", err);
+  }
+}
 
   function buildUrl(paramsObj) {
     const url = new URL(API_URL);
