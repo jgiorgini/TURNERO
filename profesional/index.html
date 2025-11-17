@@ -231,6 +231,21 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/dev";
   async function guardarLogo() {
   const url = document.getElementById("cfg_logo_url").value.trim();
+    async function cargarLogo() {
+  try {
+    const data = await fetchJSON(buildUrl({ action: "getLogoBase64" }));
+    if (data.ok && data.base64) {
+      const img = document.getElementById("logoConsultorio");
+      if (img) {
+        img.src = `data:${data.mime};base64,${data.base64}`;
+      }
+    } else {
+      console.warn("No se pudo cargar logo:", data.error);
+    }
+  } catch (err) {
+    console.error("Error al cargar logo", err);
+  }
+}
   try {
     const res = await fetchJSON(
       buildUrl({ action: "updateLogo" }),
@@ -510,6 +525,11 @@ async function cargarConfig() {
   document.getElementById("btnCrearMasivos").addEventListener("click", crearTurnosMasivos);
 
   // init
+  (async function init() {
+  await cargarLogo();
+  await cargarTratamientos();
+  await cargarTurnos();
+})();
   (async function init() {
     (async function init() {
   await cargarConfig();
