@@ -283,6 +283,21 @@
   // ==== CONFIGURACIÓN API ====
   // Usa la MISMA URL del Web App que ya funciona en profesional
   const API_URL = "https://script.google.com/macros/s/AKfycbzftYndPyC2m7l2AKuFsvYpZUESUopPooWTY3nSG-g9xsbfTgRlXdBSyZQY4SfS8DBY/exec";
+  async function cargarLogo() {
+  try {
+    const data = await fetchJSON(buildUrl({ action: "getLogoBase64" }));
+    if (data.ok && data.base64) {
+      const img = document.getElementById("logoConsultorio");
+      if (img) {
+        img.src = `data:${data.mime};base64,${data.base64}`;
+      }
+    } else {
+      console.warn("No se pudo cargar logo:", data.error);
+    }
+  } catch (err) {
+    console.error("Error al cargar logo", err);
+  }
+}
 async function cargarConfig() {
   try {
     const data = await fetchJSON(buildUrl({ action: "getConfig" }));
@@ -699,6 +714,8 @@ async function cargarConfig() {
   await cargarConfig();
   // ... resto de init (cargarTratamientos, etc.)
 })();
+    (async function init() {
+  await cargarLogo();
     currentMonth = normalizarPrimerDiaMes(new Date());
     renderCalendario(); // inicial vacío
     renderSeleccionados();
