@@ -22,33 +22,6 @@
       background: var(--bg);
     }
     .card {
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-      <img id="logoConsultorio"
-     src="https://jgiorgini.github.io/TURNERO/assets/logo_esthetic_glam.png"
-     alt="Logo consultorio"
-     style="height:56px; width:56px; border-radius:50%; object-fit:contain;">
-  <div>
- <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-  <img
-    src="https://jgiorgini.github.io/TURNERO/assets/logo_esthetic_glam.png"
-    alt="Logo consultorio"
-    style="height:56px; width:56px; border-radius:50%; object-fit:contain; border:1px solid #eee; background:#fff;"
-  >
-  <div>
-    <h1 style="margin:0; font-size:1.3rem;">Esthetic glam</h1>
-    <div style="font-size:0.8rem; color:#777;">El mimo que necesitás</div>
-  </div>
-</div>
-    <div style="font-size:0.8rem; color:#777;">El mimo que necesitás</div>
-  </div>
-</div>
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-  <img id="logoConsultorio" src="" alt="Logo consultorio" style="height:48px; border-radius:50%; object-fit:contain; background:#fff;">
-  <div>
-    <h1 style="margin:0; font-size:1.3rem;">Esthetic glam</h1>
-    <div style="font-size:0.8rem; color:#777;">El mimo que necesitás</div>
-  </div>
-</div>
       max-width: 1100px;
       margin: 0 auto;
       background: var(--card-bg);
@@ -236,7 +209,20 @@
 </head>
 <body>
   <div class="card">
-    <h1>Solicitud de turnos – Paciente</h1>
+
+    <!-- Logo + nombre consultorio -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+      <img
+        src="https://jgiorgini.github.io/TURNERO/assets/logo_esthetic_glam.png"
+        alt="Logo consultorio"
+        style="height:56px; width:56px; border-radius:50%; object-fit:contain; border:1px solid #eee; background:#fff;"
+      >
+      <div>
+        <h1 style="margin:0; font-size:1.3rem;">Esthetic glam</h1>
+        <div style="font-size:0.8rem; color:#777;">El mimo que necesitás</div>
+      </div>
+    </div>
+
     <p class="text-muted small">
       Seleccioná el tratamiento, elegí el día en el calendario y marcá uno o más horarios disponibles.
       Podés tomar más de un turno (mismo día o días diferentes). Para cada día, la suma de duración no puede superar 120 minutos.
@@ -290,35 +276,8 @@
   </div>
 
 <script>
-  // ==== CONFIGURACIÓN API ====
-  // Usa la MISMA URL del Web App que ya funciona en profesional
-  const API_URL = "https://script.google.com/macros/s/AKfycbzftYndPyC2m7l2AKuFsvYpZUESUopPooWTY3nSG-g9xsbfTgRlXdBSyZQY4SfS8DBY/exec";
-  async function cargarLogo() {
-  try {
-    const data = await fetchJSON(buildUrl({ action: "getLogoBase64" }));
-    if (data.ok && data.base64) {
-      const img = document.getElementById("logoConsultorio");
-      if (img) {
-        img.src = `data:${data.mime};base64,${data.base64}`;
-      }
-    } else {
-      console.warn("No se pudo cargar logo:", data.error);
-    }
-  } catch (err) {
-    console.error("Error al cargar logo", err);
-  }
-}
-async function cargarConfig() {
-  try {
-    const data = await fetchJSON(buildUrl({ action: "getConfig" }));
-    if (data.ok && data.logo_url) {
-      const img = document.getElementById("logoConsultorio");
-      if (img) img.src = data.logo_url;
-    }
-  } catch (err) {
-    console.error("Error al cargar config/logo", err);
-  }
-}
+  // ⬇⬇⬇ PON ACÁ LA URL DEL WEB APP CON /exec
+  const API_URL = "https://script.google.com/macros/s/AKfycbygEE4NKyPNwBb-HbBMsv2GhXuMx1_2T7ZF2hgRgnU/exec";
 
   function buildUrl(paramsObj) {
     const url = new URL(API_URL);
@@ -335,11 +294,10 @@ async function cargarConfig() {
     return res.json();
   }
 
-  // ==== ESTADO ====
   let tratamientos = [];
-  let turnosDisponibles = []; // Todos los turnos libres del rango
-  let currentMonth = new Date(); // Se usará el 1° de mes internamente
-  let diaSeleccionado = null;   // string "YYYY-MM-DD"
+  let turnosDisponibles = [];
+  let currentMonth = new Date();
+  let diaSeleccionado = null;   // "YYYY-MM-DD"
   let seleccionados = {};       // id_turno -> turno
 
   function mostrarAlerta(msg, tipo = "ok") {
@@ -403,6 +361,7 @@ async function cargarConfig() {
     const selTrat = document.getElementById("tratamiento").value;
     if (!selTrat) {
       turnosDisponibles = [];
+      diaSeleccionado = null;
       renderCalendario();
       renderHorariosDia(null);
       return;
@@ -428,7 +387,6 @@ async function cargarConfig() {
         mostrarAlerta(data.error || "Error al cargar turnos disponibles", "error");
         turnosDisponibles = [];
       } else {
-        // Se espera que vengan solo turnos LIBRE; si no, filtramos:
         turnosDisponibles = (data.turnos || []).filter(t => t.estado === "LIBRE" || !t.estado);
       }
     } catch (err) {
@@ -699,7 +657,6 @@ async function cargarConfig() {
       mostrarAlerta("No se pudo reservar ningún turno.", "error");
     }
 
-    // Después de reservar, recargamos datos del mes actual
     seleccionados = {};
     await recargarTurnosParaMes();
     renderSeleccionados();
@@ -720,15 +677,9 @@ async function cargarConfig() {
   document.getElementById("btnConfirmar").addEventListener("click", confirmarTurnos);
 
   (async function init() {
-    (async function init() {
-  await cargarConfig();
-  // ... resto de init (cargarTratamientos, etc.)
-})();
-    (async function init() {
-  await cargarLogo();
     currentMonth = normalizarPrimerDiaMes(new Date());
-    renderCalendario(); // inicial vacío
-    renderSeleccionados();
+    renderCalendario();      // esto dibuja el esqueleto del calendario SIEMPRE
+    renderSeleccionados();   // lista vacía al inicio
     await cargarTratamientos();
   })();
 </script>
